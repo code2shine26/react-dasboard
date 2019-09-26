@@ -1,0 +1,24 @@
+.footer {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+}
+.foot {
+  height: 100px;
+  width: 100px;
+  background: #fff;
+  border-radius: 50%;
+  text-align: center;
+}
+
+.MainFooter {
+  margin: "auto";
+  background: linear-gradient(45deg, #333333 30%, #333334 90%);
+  border: 0;
+  border-radius: 7;
+  box-shadow: "0 3px 5px 2px #ccc";
+  color: "white";
+  padding: "0 30px";
+}

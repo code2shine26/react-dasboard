@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import "./App.css";
-import Main from "./Components/Layout/Main";
-
-class App extends Component {
+import CommentForm from "./CommentForm";
+import Comments from "./Comments";
+import "./CommentList.css";
+class CommentList extends Component {
   constructor(props) {
     super(props);
     this.handleScroll = this.handleScroll.bind(this);
@@ -18,6 +18,7 @@ class App extends Component {
     );
   }
   handleScroll() {
+    console.log("Method invoked");
     const items = document.querySelectorAll("#timeline li");
     items.forEach(item => {
       if (this.inInViewPort(item)) {
@@ -26,17 +27,21 @@ class App extends Component {
     });
   }
   componentDidMount() {
+    console.log("Comment list mounted");
+    this.handleScroll();
     window.addEventListener("scroll", this.handleScroll);
     window.addEventListener("load", this.handleScroll);
     window.addEventListener("resize", this.handleScroll);
   }
   render() {
+    console.log("Badri::", this.props.comments);
     return (
-      <div className="App">
-        <Main />
+      <div className="CommentList">
+        <CommentForm id={this.props.id} addComment={this.props.addComment} />
+        <Comments comments={this.props.comments} />
       </div>
     );
   }
 }
 
-export default App;
+export default CommentList;
