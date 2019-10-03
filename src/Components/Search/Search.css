@@ -1,0 +1,14 @@
+.Search {
+  background: #f7f5f3;
+  border: 1px solid #333;
+  height: 200px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.Search-title {
+  font: inherit;
+}
+
+.Search-area {
+}

@@ -85,7 +85,7 @@ class DataQuery extends Component {
       <Fragment>
         <form onSubmit={this.handleSubmit} className={classes.root}>
           <FormControl className={classes.formControl}>
-            <InputLabel htmlFor="channel">Channel</InputLabel>
+            <InputLabel htmlFor="channel">Channel (*)</InputLabel>
             <Select
               value={this.state.channel}
               onChange={this.handleChannelChange}
@@ -108,7 +108,7 @@ class DataQuery extends Component {
               format="MM/dd/yyyy"
               margin="normal"
               id="date-picker-dialog"
-              label="From Date"
+              label="From Date(*)"
               value={this.state.selectedDateFrom}
               onChange={this.handleChangeFrom}
               KeyboardButtonProps={{
@@ -124,7 +124,7 @@ class DataQuery extends Component {
               format="MM/dd/yyyy"
               margin="normal"
               id="date-picker-dialog"
-              label="To Date"
+              label="To Date(*)"
               value={this.state.selectedDateTo}
               onChange={this.handleChangeTo}
               KeyboardButtonProps={{

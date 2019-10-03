@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from "react";
 import DataQuery from "../DataQuery";
+import Search from "../Search/Search";
 import DataTable from "../../Components/Layout/DataTable/DataTable";
 class ScheduleData extends Component {
   constructor(props) {
@@ -27,6 +28,7 @@ class ScheduleData extends Component {
     return (
       <Fragment>
         <DataQuery populateDataSet={this.populateDataSet} />
+        <Search />
         {this.state.data["minDate"] !== null &&
         this.state.data["maxDate"] !== null &&
         this.state.data["channel"] !== "none" ? (

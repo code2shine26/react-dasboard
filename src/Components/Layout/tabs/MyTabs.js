@@ -7,8 +7,9 @@ import Tab from "@material-ui/core/Tab";
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
 import ScheduleData from "../../ScheduleData/ScheduleData";
-import DataTable from "../DataTable/DataTable";
-import DataQuery from "../../DataQuery";
+import Report from "../../Report/Report";
+import Configuration from "../../Configuration/Configuration";
+import "./Mytabs.css";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -17,7 +18,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export default function SimpleTabs() {
+export default function FeatureTabs() {
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
 
@@ -32,24 +33,28 @@ export default function SimpleTabs() {
     };
   }
   return (
-    <div className={classes.root}>
+    <TabPanel className={classes.root}>
       <AppBar style={{ background: "#333" }} position="static">
         <Tabs
           value={value}
           onChange={handleChange}
-          aria-label="simple tabs example"
+          aria-label="Dorito Features"
         >
           <Tab label="Schedule Data" {...a11yProps(0)} />
           <Tab label="Reporting" {...a11yProps(1)} />
+          <Tab label="Admin" {...a11yProps(2)} />
         </Tabs>
       </AppBar>
       <TabPanel value={value} index={0}>
         <ScheduleData />
       </TabPanel>
       <TabPanel value={value} index={1}>
-        Under Construction
+        <Report />
       </TabPanel>
-    </div>
+      <TabPanel value={value} index={2}>
+        <Configuration />
+      </TabPanel>
+    </TabPanel>
   );
 }
 

@@ -1,0 +1,40 @@
+.Configuration {
+  background: #fff;
+  font: inherit;
+}
+
+.Configuration-form {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 20px;
+  align-items: center;
+}
+
+.Configuration-financial-year {
+  flex-basis: 100%;
+}
+
+.Configuration-acma-container {
+  flex-basis: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.Configuration-acma-contract-container {
+  flex-basis: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.Configuration-button-save {
+  flex-basis: 50%;
+  align-self: center;
+  border-radius: 12px;
+  background: #333;
+  color: #fff;
+  font-size: 1rem;
+  align-self: center;
+  padding: 10px;
+}

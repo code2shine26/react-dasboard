@@ -91,9 +91,6 @@ class DataTable extends Component {
             }
           }
         ]}
-        options={{
-          filtering: true
-        }}
         editable={{
           onRowAdd: newData =>
             new Promise((resolve, reject) => {
@@ -108,11 +105,19 @@ class DataTable extends Component {
             }),
           onRowUpdate: (newData, oldData) =>
             new Promise((resolve, reject) => {
+              console.log("nedata::", newData);
+              console.log("oldData::", oldData);
+              let oldDate = new Date(oldData.airdate);
+              let newDate = new Date(newData.airdate);
+              console.log("nedata::", newDate);
+              console.log("oldData::", oldDate);
+
               setTimeout(() => {
                 {
                   const data = this.state.data;
                   const index = data.indexOf(oldData);
                   data[index] = newData;
+
                   this.setState({ data }, () => resolve());
                 }
                 resolve();
