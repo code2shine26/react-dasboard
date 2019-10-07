@@ -1,0 +1,9 @@
+.ProgressCircle {
+  width: 70px;
+  height: 70px;
+}
+
+.ConfigDisplayTitle {
+  font-family: inherit;
+  font-size: 1rem;
+}

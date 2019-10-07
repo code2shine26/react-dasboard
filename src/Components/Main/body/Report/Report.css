@@ -1,0 +1,13 @@
+.Report {
+  display: flex;
+  justify-content: space-between;
+}
+
+.Report-Metadata {
+  display: flex;
+  width: 45%;
+  border: solid 1px black;
+  padding: 5px;
+  background: #fff;
+  flex-direction: column;
+}

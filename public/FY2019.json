@@ -1,0 +1,39 @@
+{
+  "acmaCategoryCaptions": {
+    "Exempt GES": 0,
+    "Exempt Movies": 0,
+    "Exempt Music": 0,
+    "Exempt News": 0,
+    "Exempt Sports": 0,
+    "GES Cat A": 50,
+    "GES Cat B": 60,
+    "GES Cat C": 80,
+    "Max": 100,
+    "Movies Cat A": 85,
+    "Movies Cat B": 36,
+    "Movies Cat C": 75,
+    "Music": 36,
+    "News": 63,
+    "Sports": 19
+  },
+  "channelContactualCaptions": {
+    "Exempt GES": 0,
+    "Exempt Movies": 0,
+    "Exempt Music": 0,
+    "Exempt News": 0,
+    "Exempt Sports": 0,
+    "GES Cat A": 40,
+    "GES Cat B": 50,
+    "GES Cat C": 70,
+    "Max": 100,
+    "Movies Cat A": 80,
+    "Movies Cat B": 30,
+    "Movies Cat C": 70,
+    "Music": 30,
+    "News": 61,
+    "Sports": 17
+  },
+  "GES Cat A": {
+    "channels": ["Fox8", "Fox7", "Fox6"]
+  }
+}

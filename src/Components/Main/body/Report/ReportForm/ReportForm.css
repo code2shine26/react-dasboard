@@ -1,0 +1,25 @@
+.ReportForm {
+  font: inherit;
+  background: rgb(247, 247, 247);
+  border: solid 1px black;
+  width: 50%;
+}
+
+.Report-button-save {
+  border-radius: 12px;
+  background: #333;
+  color: rgb(252, 249, 249);
+  font-size: 1rem;
+  align-self: center;
+  margin-top: 30px;
+  padding: 15px;
+  width: 40%;
+}
+.Rep-form {
+  padding: 20px;
+}
+
+.radio-options {
+  display: flex;
+  justify-content: center;
+}
