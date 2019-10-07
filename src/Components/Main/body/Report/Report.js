@@ -54,6 +54,15 @@ export default function Report(props) {
       />
       {channelState.acmaCaption !== 0 && (
         <div className="Report-Metadata">
+          <ConfigDisplay
+            color="#1ABC9C"
+            message="ACMA Caption"
+            percentage={channelState.acmaCaption}
+          />
+          <ConfigDisplay
+            message="Contractual Caption"
+            percentage={channelState.contractualCaption}
+          />
           <TextField
             style={{
               color: "none"
@@ -98,15 +107,6 @@ export default function Report(props) {
             margin="normal"
             disabled
             variant="standard"
-          />
-          <ConfigDisplay
-            color="#1ABC9C"
-            message="ACMA Caption"
-            percentage={channelState.acmaCaption}
-          />
-          <ConfigDisplay
-            message="Contractual Caption"
-            percentage={channelState.contractualCaption}
           />
         </div>
       )}

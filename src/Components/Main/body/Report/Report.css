@@ -1,6 +1,6 @@
 .Report {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-evenly;
 }
 
 .Report-Metadata {
@@ -8,6 +8,6 @@
   width: 45%;
   border: solid 1px black;
   padding: 5px;
-  background: #fff;
+  background: rgb(248, 246, 246);
   flex-direction: column;
 }

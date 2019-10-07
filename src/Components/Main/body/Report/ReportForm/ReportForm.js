@@ -79,7 +79,7 @@ export default function ReportForm(props) {
       <form className="Rep-form">
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <FormControl required fullWidth variant="filled">
+            <FormControl required fullWidth variant="standard">
               <InputLabel htmlFor="acma-category">Compliance Period</InputLabel>
               <Select
                 onChange={handleChange("compliancePeriod")}
@@ -100,7 +100,7 @@ export default function ReportForm(props) {
           </Grid>
           <Grid item xs={12}>
             <FormControl
-              variant="outlined"
+              variant="standard"
               fullWidth
               required
               component="fieldset"
@@ -129,7 +129,7 @@ export default function ReportForm(props) {
           </Grid>
           {values.selection === "ch" ? (
             <Grid item xs={12}>
-              <FormControl fullWidth required variant="filled">
+              <FormControl fullWidth required variant="standard">
                 <InputLabel htmlFor="acma-category">Channel</InputLabel>
                 <Select
                   value={values.channel}
@@ -146,7 +146,7 @@ export default function ReportForm(props) {
           ) : null}
           {values.selection === "cg" ? (
             <Grid item xs={12}>
-              <FormControl fullWidth variant="filled">
+              <FormControl fullWidth variant="standard">
                 <InputLabel htmlFor="acma-category">Channel Group</InputLabel>
                 <Select
                   value={values.channelGroup}
@@ -165,7 +165,7 @@ export default function ReportForm(props) {
           ) : null}
           <Grid item xs={12}>
             <TextField
-              variant="filled"
+              variant="standard"
               fullWidth
               required
               id="date"
@@ -179,7 +179,7 @@ export default function ReportForm(props) {
           </Grid>
           <Grid item xs={12}>
             <FormControl
-              variant="filled"
+              variant="standard"
               fullWidth
               className="ReportForm-item"
               required
