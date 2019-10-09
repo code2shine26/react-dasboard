@@ -1,0 +1,9 @@
+.ConfigDisplay {
+  display: flex;
+  align-content: center;
+  justify-content: space-between;
+  padding: 5px;
+  box-shadow: 3px 3px 5px 6px #666;
+  background: #fff;
+  margin: 10px;
+}

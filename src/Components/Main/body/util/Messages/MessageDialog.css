@@ -1,0 +1,15 @@
+.MessagDaialog {
+  margin: 5px;
+  color: #fff;
+  width: 70%;
+  margin: auto;
+  padding: 10px;
+}
+
+.success {
+  background: #43a047;
+}
+
+.failure {
+  background: #d32e30;
+}
