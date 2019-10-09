@@ -3,7 +3,13 @@ import Typography from "@material-ui/core/Typography";
 import AppBar from "@material-ui/core/AppBar";
 import FormControl from "@material-ui/core/FormControl";
 import MenuItem from "@material-ui/core/MenuItem";
+import DateFnsUtils from "@date-io/date-fns";
 import InputLabel from "@material-ui/core/InputLabel";
+import MessageDialog from "../../util/Messages/MessageDialog";
+import {
+  KeyboardDatePicker,
+  MuiPickersUtilsProvider
+} from "@material-ui/pickers";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import Radio from "@material-ui/core/Radio";
@@ -38,45 +44,86 @@ export default function ReportForm(props) {
     setValues({ ...values, [name]: event.target.value });
   };
 
+  const clearFields = () => {
+    setValues({
+      compliancePeriod: "",
+      channel: "",
+      selection: "ch",
+      channelGroup: "",
+      reportType: "",
+      effectiveDate: new Date()
+    });
+  };
+
+  const handleDateChange = newDate => {
+    setValues({ ...values, effectiveDate: newDate });
+  };
+  const onSubmitHandler = evt => {
+    evt.preventDefault();
+    clearFields();
+  };
+  const shoudEnable = () => {
+    let flag = false;
+    if (
+      values.compliancePeriod == "" ||
+      (values.channel == "" && values.selection === "ch") ||
+      (values.channelGroup == "" && values.selection === "cg") ||
+      values.reportType == "" ||
+      values.compliancePeriod == ""
+    ) {
+      flag = true;
+    }
+    console.log("Flag:::", flag);
+    return flag;
+  };
   const classes = useStyles();
   const [values, setValues] = React.useState({
-    compliancePeriod: 0,
-    channel: 0,
+    compliancePeriod: "",
+    channel: "",
     selection: "ch",
-    channelGroup: 0,
-    reportType: 0
+    channelGroup: "",
+    reportType: "",
+    effectiveDate: new Date()
   });
 
-  // useEffect(
-  //   () => {
-  //     async function getChannelStateData() {
-  //       const response = await axios.get(
-  //         `${endpoint}name=${values.channel}&finYear=${values.compliancePeriod}`
-  //       );
-  //       console.log("Channel State", response.data);
-  //       setChannelState(response.data);
-  //     }
-  //     if (values.compliancePeriod !== 0 && values.channel !== 0) {
-  //       getChannelStateData();
-  //     }
-  //   },
-  //   [values.channel],
-  //   [values.compliancePeriod]
-  // );
-
   useEffect(() => {
-    if (values.channel !== 0 && values.compliancePeriod !== 0) {
+    console.log("Use effect called:::", values.selection);
+    if (values.channel !== "" && values.compliancePeriod !== "") {
       props.getChannelState(values.channel, values.compliancePeriod);
     }
   }, [values.channel, values.compliancePeriod]);
 
+  useEffect(() => {
+    if (values.selection === "cg") {
+      props.hideMetaData(false);
+    } else {
+      props.hideMetaData(true);
+    }
+  }, [values.selection]);
+
+  useEffect(() => {
+    if (
+      values.compliancePeriod === "" &&
+      values.channel === "" &&
+      values.channelGroup === "" &&
+      values.reportType === ""
+    ) {
+      props.clearFields();
+    }
+  }, [
+    values.compliancePeriod,
+    values.channel,
+    values.channelGroup,
+    values.reportType
+  ]);
+
   return (
     <div className="ReportForm">
-      <AppBar position="static" style={{ background: "#555" }}>
+      <AppBar position="static" style={{ background: "#484c7f" }}>
         <Typography variant="h7">Report Generation</Typography>
       </AppBar>
 
-      <form className="Rep-form">
+      <form className="Rep-form" onSubmit={onSubmitHandler}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <FormControl required fullWidth variant="standard">
@@ -164,18 +211,22 @@ export default function ReportForm(props) {
             </Grid>
           ) : null}
           <Grid item xs={12}>
-            <TextField
-              variant="standard"
-              fullWidth
-              required
-              id="date"
-              label="Effective Date"
-              type="date"
-              defaultValue="2017-05-24"
-              InputLabelProps={{
-                shrink: true
-              }}
-            />
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <KeyboardDatePicker
+                fullWidth
+                disableToolbar
+                variant="inline"
+                format="MM/dd/yyyy"
+                margin="normal"
+                id="date-picker-inline"
+                label="Date picker inline"
+                value={values.effectiveDate}
+                onChange={handleDateChange}
+                KeyboardButtonProps={{
+                  "aria-label": "change date"
+                }}
+              />
+            </MuiPickersUtilsProvider>
           </Grid>
           <Grid item xs={12}>
             <FormControl
@@ -197,16 +248,16 @@ export default function ReportForm(props) {
             </FormControl>
           </Grid>
           <Grid item xs={12}>
-            <Button
-              variant="contained"
-              color="secondary"
-              className={classes.button}
-            >
+            <button disabled={shoudEnable()} className="GenerateReport">
               Generate Report
-            </Button>
+            </button>
           </Grid>
+          {/* <Grid item xs={12}>
+            <button className="GenerateReport">Clear</button>
+          </Grid> */}
         </Grid>
       </form>
+      {/* <MessageDialog message="All good" outcome="success" /> */}
     </div>
   );
 }

@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import ReportForm from "./ReportForm/ReportForm";
-import ConfigDisplay from "../util/ConfigDisplay/ConfigDisplay";
+import Metadata from "../util/Metadata/Metadata";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
@@ -25,48 +25,77 @@ const useStyles = makeStyles(theme => ({
 }));
 export default function Report(props) {
   const classes = useStyles();
+  const clearFields = () => {
+    console.log("Clear fields called");
+    setChannelState({
+      acmaCaption: 0,
+      acmaCategory: "",
+      channelConfig: [],
+      channelGroup: "",
+      contractualCaption: 0,
+      launchEnd: "",
+      launchStart: "",
+      tier: ""
+    });
+  };
+  const [display, setDisplay] = useState(false);
   const [channelState, setChannelState] = React.useState({
     acmaCaption: 0,
-    acmaCategory: 0,
+    acmaCategory: "",
     channelConfig: [],
-    channelGroup: 0,
+    channelGroup: "",
     contractualCaption: 0,
     launchEnd: "",
     launchStart: "",
     tier: ""
   });
+
+  const hideMetaData = flag => {
+    console.log("hide Metadata called::", flag);
+    setDisplay(flag);
+  };
   const getChannelState = async (channelName, finYear) => {
     console.log("ChannName", channelName);
     console.log("finYear", finYear);
     const response = await axios.get(
       `${endpoint}name=${channelName}&finYear=${finYear}`
     );
-    console.log("Channel State response", response.data);
-    setChannelState(response.data[0]);
+    console.log("Channel State response", response);
+    if (response.status === 200 && response.data) {
+      setChannelState(response.data[0]);
+      setDisplay(true);
+    }
   };
   const endpoint = "http://localhost:3004/channel?";
   return (
     <div className="Report">
       <ReportForm
         {...props}
+        hideMetaData={hideMetaData}
         getChannelState={getChannelState}
         channelState={channelState}
+        clearFields={clearFields}
       />
-      {channelState.acmaCaption !== 0 && (
+      {display && !channelState && (
+        <div className="Data-not-found">
+          <h3>Data not found !</h3>
+          <p>
+            No configuration data available. Try with a different financial year{" "}
+          </p>
+        </div>
+      )}
+      {display && channelState && (
         <div className="Report-Metadata">
-          <ConfigDisplay
+          <Metadata
             color="#1ABC9C"
             message="ACMA Caption"
             percentage={channelState.acmaCaption}
           />
-          <ConfigDisplay
+          <Metadata
             message="Contractual Caption"
             percentage={channelState.contractualCaption}
           />
           <TextField
-            style={{
-              color: "none"
-            }}
             disabled
             label="Acma Category"
             value={channelState.acmaCategory}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import AppBar from "@material-ui/core/AppBar";
@@ -7,79 +7,189 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import Button from "@material-ui/core/Button";
+import axios from "axios";
 import "./ChannelContractualForm.css";
 
 import FormControl from "@material-ui/core/FormControl";
-export default function ChannelContractualCaptionForm() {
+export default function ChannelContractualCaptionForm(props) {
+  const endpoint = "http://localhost:3004/contractualCaption";
+
+  const handleSubmit = evt => {
+    evt.preventDefault();
+  };
+
+  const isSaveAcmaConfigDisabled = () => {
+    if (values.acmaCategory === "" || values.compliancePeriod === "") {
+      return true;
+    }
+    return false;
+  };
+
+  const isHideSaveAcmaConfig = () => {
+    if (
+      isCaptionDisbaled(values.actualCaptionPercent, values.compliancePeriod)
+    ) {
+      return true;
+    }
+    return false;
+  };
+  const isCaptionDisbaled = (captionPercent, finYear) => {
+    //exempt categoey
+    return isCaptionExempt(captionPercent) || isMaxCaptions(captionPercent);
+  };
+
+  const isMaxCaptions = percent => {
+    if (percent && percent === 100) {
+      return true;
+    }
+    return false;
+  };
+  const getCaptionValue = captionVal => {
+    if (isCaptionExempt(captionVal)) {
+      return "N/A";
+    }
+    return captionVal;
+  };
   const handleChange = name => event => {
     setValues({ ...values, [name]: event.target.value });
   };
   const [values, setValues] = useState({
-    acmaCategory: 0,
-    captionPercent: 40
+    acmaCategory: "",
+    actualCaptionPercent: 0,
+    compliancePeriod: "",
+    prevYearCaptionPercent: 0,
+    dataNotFound: false
   });
+  const isCurrentFinYear = () => {
+    let currYear = new Date().getFullYear();
+    if (values.compliancePeriod !== "") {
+      if (currYear === values.compliancePeriod) {
+        return true;
+      }
+    }
+  };
+
+  const isCaptionExempt = percent => {
+    if (percent && percent === -1) {
+      return true;
+    }
+    return false;
+  };
+  useEffect(() => {
+    if (values.compliancePeriod !== "" && values.acmaCategory !== "") {
+      async function getCaptionCompliance() {
+        let selectedYearResponse = await axios.get(
+          `${endpoint}?finYear=${values.compliancePeriod}&catgory=${values.acmaCategory}`
+        );
+        let respCurrent = selectedYearResponse.data[0];
+        let previousYearResponse = await axios.get(
+          `${endpoint}?finYear=${values.compliancePeriod - 1}&catgory=${
+            values.acmaCategory
+          }`
+        );
+        let respPrevious = previousYearResponse.data[0];
+        console.log("Anwitha:::", respCurrent, respPrevious);
+        if (respCurrent) {
+          setValues({
+            ...values,
+            prevYearCaptionPercent: respPrevious["caption"],
+            actualCaptionPercent: respCurrent["caption"]
+          });
+        }
+        //   if (respPrevious) {
+        //     setValues({
+        //       ...values,
+        //       prevYearCaptionPercent: respPrevious["caption"]
+        //     });
+        //   }
+        // }
+      }
+      getCaptionCompliance();
+    }
+  }, [values.compliancePeriod, values.acmaCategory]);
 
   return (
-    <div className="CahnnelContractualCaptionForm">
-      <AppBar position="static" style={{ background: "#555" }}>
+    <div className="AcmaCaptionForm">
+      <AppBar position="static" style={{ background: "#484c7f" }}>
         <Typography variant="h7">Channel Contractual Configuration</Typography>
       </AppBar>
-      <form className="Acma-form">
+      <form className="Acma-form" onSubmit={handleSubmit}>
         <Grid container spacing={3}>
+          {values.dataNotFound && (
+            <Grid item xs={12}>
+              <div className="acma-data-not-found">
+                <h3>Data not found !</h3>
+                <p>
+                  No caption data available. Please enter the caption % for the
+                  financial year {values.compliancePeriod}
+                </p>
+              </div>
+            </Grid>
+          )}
           <Grid item xs={12}>
-            <FormControl required fullWidth variant="filled">
+            <FormControl required fullWidth variant="standard">
               <InputLabel htmlFor="acma-category">Compliance Period</InputLabel>
               <Select
                 value={values.compliancePeriod}
                 onChange={handleChange("compliancePeriod")}
               >
                 <MenuItem value={0}>Select Compliance Period</MenuItem>
-                <MenuItem value={1}>2019-2020</MenuItem>
-                <MenuItem value={2}>2018-2019</MenuItem>
-                <MenuItem value={3}>2017-2018</MenuItem>
-                <MenuItem value={4}>2016-1017</MenuItem>
-                <MenuItem value={5}>2015-2016</MenuItem>
+                {props.fyYears &&
+                  props.fyYears.map(fyYear => {
+                    return <MenuItem value={fyYear}>{`FY${fyYear}`}</MenuItem>;
+                  })}
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={9}>
-            <FormControl required fullWidth variant="filled">
+          <Grid item xs={12}>
+            <FormControl required fullWidth variant="standard">
               <InputLabel htmlFor="acma-category">ACMA Category</InputLabel>
               <Select
                 value={values.acmaCategory}
                 onChange={handleChange("acmaCategory")}
               >
                 <MenuItem value={0}>Select ACMA Category</MenuItem>
-                <MenuItem value={1}>Exempt GES</MenuItem>
-                <MenuItem value={2}>Exempt Movies</MenuItem>
-                <MenuItem value={3}>Exempt Music</MenuItem>
-                <MenuItem value={4}>Exempt Sports</MenuItem>
-                <MenuItem value={5}>GES Cat A</MenuItem>
-                <MenuItem value={6}>GES Cat B</MenuItem>
-                <MenuItem value={7}>GES Cat C</MenuItem>
-                <MenuItem value={8}>Max</MenuItem>
-                <MenuItem value={9}>Movies Cat A</MenuItem>
-                <MenuItem value={10}>Movies Cat B</MenuItem>
-                <MenuItem value={11}>Movies Cat C</MenuItem>
-                <MenuItem value={12}>Music</MenuItem>
-                <MenuItem value={13}>News</MenuItem>
-                <MenuItem value={14}>Sports</MenuItem>
+                {props.acmaCategories &&
+                  props.acmaCategories.map(category => {
+                    return <MenuItem value={category}>{category}</MenuItem>;
+                  })}
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={3}>
+          <Grid item xs={6}>
             <TextField
               required
               fullWidth
+              disabled={isCaptionDisbaled(
+                values.actualCaptionPercent,
+                values.compliancePeriod
+              )}
+              variant="standard"
+              id="standard-required"
+              label="Caption % "
+              onChange={handleChange("actualCaptionPercent")}
+              value={getCaptionValue(values.actualCaptionPercent)}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <TextField
+              disabled
+              fullWidth
               variant="filled"
               id="standard-required"
-              label="Required"
+              label="Contactual Caption %(Prev year) "
+              value={getCaptionValue(values.prevYearCaptionPercent)}
             />
           </Grid>
           <Grid item xs={12}>
-            <Button variant="contained" color="secondary">
-              Save Changes
-            </Button>
+            {!isHideSaveAcmaConfig() && (
+              <button
+                disabled={isSaveAcmaConfigDisabled()}
+                className="GenerateReport"
+              >
+                Save
+              </button>
+            )}
           </Grid>
         </Grid>
       </form>

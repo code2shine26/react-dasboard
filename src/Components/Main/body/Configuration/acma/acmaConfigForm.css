@@ -6,3 +6,36 @@
   margin-bottom: 30px;
   background: #fff;
 }
+
+.GenerateReport {
+  margin-top: 20px;
+  background: #31353d;
+  text-align: center;
+  padding: 15px;
+  color: white;
+  width: 200px;
+  border-radius: 5px;
+  border: none;
+  outline: none;
+
+  font-size: 1rem;
+}
+.GenerateReport:hover {
+  border: solid 3px coral;
+  color: coral;
+  cursor: pointer;
+}
+.GenerateReport:hover[disabled] {
+  border: solid 2px coral;
+  cursor: no-drop;
+}
+.GenerateReport[disabled] {
+  background: rgb(82, 81, 81);
+  cursor: no-drop;
+}
+
+.acma-data-not-found {
+  background: rgb(58, 57, 61);
+  border: solid 1px #333;
+  color: #fff;
+}

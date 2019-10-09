@@ -52,7 +52,7 @@ export default function FeatureTabs(props) {
         <Report {...props} />
       </TabPanel>
       <TabPanel value={value} index={2}>
-        <Configuration />
+        <Configuration {...props} />
       </TabPanel>
     </TabPanel>
   );
