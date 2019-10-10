@@ -1,8 +1,7 @@
 .Configuration {
   font: inherit;
-  width: 50%;
-  margin: auto;
+  width: 100%;
   display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
+  flex-direction: row;
+  flex-wrap: wrap;
 }

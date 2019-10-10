@@ -109,7 +109,7 @@ export default function ChannelContractualCaptionForm(props) {
   }, [values.compliancePeriod, values.acmaCategory]);
 
   return (
-    <div className="AcmaCaptionForm">
+    <div className="ContractualCaptionForm">
       <AppBar position="static" style={{ background: "#484c7f" }}>
         <Typography variant="h7">Channel Contractual Configuration</Typography>
       </AppBar>

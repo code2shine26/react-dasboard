@@ -3,8 +3,10 @@
 }
 
 .AcmaCaptionForm {
-  margin-bottom: 30px;
   background: #fff;
+  border: solid 1px #333;
+  width: 30%;
+  margin: auto;
 }
 
 .GenerateReport {

@@ -6,8 +6,11 @@
 }
 
 .ChannelConfig {
-  margin-bottom: 30px;
   background: #fff;
+  margin: auto;
+  width: 40%;
+  margin-top: 40px;
+  border: solid 1px #333;
 }
 
 .ChannelConfig-button-save {

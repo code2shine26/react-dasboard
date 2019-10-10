@@ -12,8 +12,13 @@ import FormGroup from "@material-ui/core/FormGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
 import "./ChannelConfig.css";
-export default function ChannelConfig() {
+export default function ChannelConfig(props) {
+  const handleChangeCheckbox = name => event => {
+    setValues({ ...values, [name]: event.target.checked });
+  };
   const handleChange = name => event => {
+    console.log("name::", name);
+    console.log("event::", event);
     setValues({ ...values, [name]: event.target.value });
   };
   const [values, setValues] = useState({
@@ -30,14 +35,14 @@ export default function ChannelConfig() {
 
   return (
     <div className="ChannelConfig">
-      <AppBar position="static" style={{ background: "#555" }}>
+      <AppBar position="static" style={{ background: "#484c7f" }}>
         <Typography variant="h7">Channel Configuration</Typography>
       </AppBar>
       <div>
         <form className="ChannelConfig-form">
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <FormControl required fullWidth variant="filled">
+              <FormControl required fullWidth variant="standard">
                 <InputLabel htmlFor="acma-category">
                   Compliance Period
                 </InputLabel>
@@ -46,89 +51,82 @@ export default function ChannelConfig() {
                   onChange={handleChange("compliancePeriod")}
                 >
                   <MenuItem value={0}>Select Compliance Period</MenuItem>
-                  <MenuItem value={1}>2019-2020</MenuItem>
-                  <MenuItem value={2}>2018-2019</MenuItem>
-                  <MenuItem value={3}>2017-2018</MenuItem>
-                  <MenuItem value={4}>2016-1017</MenuItem>
-                  <MenuItem value={5}>2015-2016</MenuItem>
+
+                  {props.fyYears &&
+                    props.fyYears.map(fyYear => {
+                      return (
+                        <MenuItem value={fyYear}>{`FY${fyYear}`}</MenuItem>
+                      );
+                    })}
                 </Select>
               </FormControl>
             </Grid>
+
             <Grid item xs={12}>
-              <FormControl required fullWidth variant="filled">
+              <FormControl required fullWidth variant="standard">
                 <InputLabel htmlFor="acma-category">Channel</InputLabel>
                 <Select
                   value={values.channel}
                   onChange={handleChange("channel")}
                 >
                   <MenuItem value={0}>Select Channel</MenuItem>
-                  <MenuItem value={1}>FOX8</MenuItem>
-                  <MenuItem value={2}>Showcase</MenuItem>
-                  <MenuItem value={3}>E!</MenuItem>
-                  <MenuItem value={4}>ESPN</MenuItem>
-                  <MenuItem value={5}>CNN</MenuItem>
+                  {props.channelList &&
+                    props.channelList.map(channel => {
+                      return <MenuItem value={channel}>{channel}</MenuItem>;
+                    })}
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12}>
-              <FormControl required fullWidth variant="filled">
-                <InputLabel htmlFor="acma-category">Channel Group</InputLabel>
-                <Select
-                  value={values.channelGroup}
-                  onChange={handleChange("channelGroup")}
-                >
-                  <MenuItem value={0}>Select Channel Group</MenuItem>
-                  <MenuItem value={1}>KidsCo</MenuItem>
-                  <MenuItem value={2}>Dicovery</MenuItem>
-                  <MenuItem value={3}>Disney</MenuItem>
-                  <MenuItem value={4}>SBS</MenuItem>
-                  <MenuItem value={5}>Sky News</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12}>
-              <FormControl required fullWidth variant="filled">
-                <InputLabel htmlFor="acma-category">Teir</InputLabel>
-                <Select value={values.tier} onChange={handleChange("tier")}>
-                  <MenuItem value={0}>Select Teir</MenuItem>
-                  <MenuItem value={1}>KidsCo</MenuItem>
-                  <MenuItem value={2}>Dicovery</MenuItem>
-                  <MenuItem value={3}>Disney</MenuItem>
-                  <MenuItem value={4}>SBS</MenuItem>
-                  <MenuItem value={5}>Sky News</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12}>
-              <FormControl required fullWidth variant="filled">
+              <FormControl required fullWidth variant="standard">
                 <InputLabel htmlFor="acma-category">ACMA Category</InputLabel>
                 <Select
                   value={values.acmaCategory}
                   onChange={handleChange("acmaCategory")}
                 >
                   <MenuItem value={0}>Select ACMA Category</MenuItem>
-                  <MenuItem value={1}>Exempt GES</MenuItem>
-                  <MenuItem value={2}>Exempt Movies</MenuItem>
-                  <MenuItem value={3}>Exempt Music</MenuItem>
-                  <MenuItem value={4}>Exempt Sports</MenuItem>
-                  <MenuItem value={5}>GES Cat A</MenuItem>
-                  <MenuItem value={6}>GES Cat B</MenuItem>
-                  <MenuItem value={7}>GES Cat C</MenuItem>
-                  <MenuItem value={8}>Max</MenuItem>
-                  <MenuItem value={9}>Movies Cat A</MenuItem>
-                  <MenuItem value={10}>Movies Cat B</MenuItem>
-                  <MenuItem value={11}>Movies Cat C</MenuItem>
-                  <MenuItem value={12}>Music</MenuItem>
-                  <MenuItem value={13}>News</MenuItem>
-                  <MenuItem value={14}>Sports</MenuItem>
+                  {props.acmaCategories &&
+                    props.acmaCategories.map(category => {
+                      return <MenuItem value={category}>{category}</MenuItem>;
+                    })}
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12}>
+              <FormControl fullWidth variant="standard">
+                <InputLabel htmlFor="acma-category">Channel Group</InputLabel>
+                <Select
+                  value={values.channelGroup}
+                  onChange={handleChange("channelGroup")}
+                >
+                  <MenuItem value={0}>Select Channel Group</MenuItem>
+                  {props.channelGroups &&
+                    props.channelGroups.map(channelGroup => {
+                      return (
+                        <MenuItem value={channelGroup}>{channelGroup}</MenuItem>
+                      );
+                    })}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth variant="standard">
+                <InputLabel htmlFor="acma-category">Teir</InputLabel>
+                <Select value={values.tier} onChange={handleChange("tier")}>
+                  <MenuItem value={0}>Select Teir</MenuItem>
+                  {props.tier &&
+                    props.tier.map(tier => {
+                      return <MenuItem value={tier}>{tier}</MenuItem>;
+                    })}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12}>
               <div className="ChannelConfig-type">
                 <FormGroup row>
                   <FormControlLabel
-                    onChange={handleChange("sdChannel")}
+                    onChange={handleChangeCheckbox("sdChannel")}
                     control={
                       <Checkbox
                         checked={values.sdChannel}
@@ -138,7 +136,7 @@ export default function ChannelConfig() {
                     label="SD"
                   />
                   <FormControlLabel
-                    onChange={handleChange("hdChannel")}
+                    onChange={handleChangeCheckbox("hdChannel")}
                     control={
                       <Checkbox
                         checked={values.hdChannel}
@@ -148,7 +146,7 @@ export default function ChannelConfig() {
                     label="HD"
                   />
                   <FormControlLabel
-                    onChange={handleChange("fourkChannel")}
+                    onChange={handleChangeCheckbox("fourkChannel")}
                     control={
                       <Checkbox
                         checked={values.fourkChannel}
@@ -158,27 +156,25 @@ export default function ChannelConfig() {
                     label="4k"
                   />
                   <FormControlLabel
-                    onChange={handleChange("plus2channel")}
+                    onChange={handleChangeCheckbox("plus2channel")}
                     control={
                       <Checkbox
                         checked={values.plus2channel}
                         value={values.plus2channel}
                       />
                     }
-                    label="plus two"
+                    label="+2"
                   />
                 </FormGroup>
               </div>
             </Grid>
             <Grid item xs={6}>
               <TextField
-                required
                 fullWidth
                 variant="filled"
                 id="datetime-local"
-                label="Next appointment"
+                label="Launch Start Date"
                 type="datetime-local"
-                defaultValue="2017-05-24T10:30"
                 InputLabelProps={{
                   shrink: true
                 }}
@@ -186,22 +182,18 @@ export default function ChannelConfig() {
             </Grid>
             <Grid item xs={6}>
               <TextField
-                required
                 fullWidth
                 variant="filled"
                 id="datetime-local"
-                label="Next appointment"
+                label="Launch End Date"
                 type="datetime-local"
-                defaultValue="2017-05-24T10:30"
                 InputLabelProps={{
                   shrink: true
                 }}
               />
             </Grid>
             <Grid ullWidth xs={12}>
-              <Button variant="contained" color="secondary">
-                Save Changes
-              </Button>
+              <button className="GenerateReport">Save</button>
             </Grid>
           </Grid>
         </form>
