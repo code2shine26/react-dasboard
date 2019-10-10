@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Metadata from '../util/Metadata/Metadata'
 import ReportForm from "./ReportForm/ReportForm";
-import Metadata from "../util/Metadata/Metadata";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import AppBar from "@material-ui/core/AppBar";
+import FormGroup from "@material-ui/core/FormGroup";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Checkbox from "@material-ui/core/Checkbox";
 import "./Report.css";
 const useStyles = makeStyles(theme => ({
   container: {
@@ -24,27 +27,34 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 export default function Report(props) {
+  const ACMA_CAPTION_END_POINT='http://localhost:3004/acmaCaption?'
+  const CONTRACTUAL_CAPTION_END_POINT='http://localhost:3004/contractualCaption?'
   const classes = useStyles();
   const clearFields = () => {
     console.log("Clear fields called");
     setChannelState({
-      acmaCaption: 0,
       acmaCategory: "",
-      channelConfig: [],
+      hdChannel:false,
+      sdChannel:false,
+      fourkChannel:false,
       channelGroup: "",
-      contractualCaption: 0,
       launchEnd: "",
       launchStart: "",
       tier: ""
     });
+    setAcmaCaption(0);
+    setcontractualCaption(0)
   };
   const [display, setDisplay] = useState(false);
+  const [acmaCaption,setAcmaCaption]=useState(0);
+  const [contractualCaption,setcontractualCaption]=useState(0);
   const [channelState, setChannelState] = React.useState({
-    acmaCaption: 0,
     acmaCategory: "",
-    channelConfig: [],
+    hdChannel:false,
+    sdChannel:false,
+    fourkChannel:false,
+    plus2channel: false,
     channelGroup: "",
-    contractualCaption: 0,
     launchEnd: "",
     launchStart: "",
     tier: ""
@@ -58,11 +68,29 @@ export default function Report(props) {
     console.log("ChannName", channelName);
     console.log("finYear", finYear);
     const response = await axios.get(
-      `${endpoint}name=${channelName}&finYear=${finYear}`
+      `${endpoint}channel=${channelName}&finYear=${finYear}`
     );
+    
     console.log("Channel State response", response);
     if (response.status === 200 && response.data) {
-      setChannelState(response.data[0]);
+      let acmaCategory = response.data[0]['acmaCategory']
+      const captionDetails = await axios.get(
+        `${ACMA_CAPTION_END_POINT}category=${acmaCategory}&finYear=${finYear}`
+      );
+      const contractualCaptionDetails = await axios.get(
+        `${CONTRACTUAL_CAPTION_END_POINT}category=${acmaCategory}&finYear=${finYear}`
+      );
+     // console.log('captionDetails:::',captionDetails);
+      if(captionDetails.data[0] && captionDetails.data[0].caption) {
+        setAcmaCaption(captionDetails.data[0].caption)
+      }
+      if(contractualCaptionDetails.data[0] && contractualCaptionDetails.data[0].caption) {
+        setcontractualCaption(contractualCaptionDetails.data[0].caption)
+      }
+      if(response.data[0]){
+        setChannelState(response.data[0]);
+      }
+     
       setDisplay(true);
     }
   };
@@ -89,11 +117,11 @@ export default function Report(props) {
           <Metadata
             color="#1ABC9C"
             message="ACMA Caption"
-            percentage={channelState.acmaCaption}
+            percentage={acmaCaption}
           />
           <Metadata
             message="Contractual Caption"
-            percentage={channelState.contractualCaption}
+            percentage={contractualCaption}
           />
           <TextField
             disabled
@@ -116,13 +144,48 @@ export default function Report(props) {
             disabled
             variant="standard"
           />
-          <TextField
-            label="Resolutions"
-            value={channelState.channelConfig}
-            margin="normal"
-            disabled
-            variant="standard"
+          <FormGroup row>
+          <FormControlLabel
+            control={
+              <Checkbox
+              disabled
+                checked={channelState.sdChannel}
+                value={channelState.sdChannel}
+              />
+            }
+            label="SD"
           />
+          <FormControlLabel
+            control={
+              <Checkbox
+              disabled
+                checked={channelState.hdChannel}
+                value={channelState.hdChannel}
+              />
+            }
+            label="HD"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+              disabled
+                checked={channelState.fourkChannel}
+                value={channelState.fourkChannel}
+              />
+            }
+            label="4k"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+              disabled
+                checked={channelState.plus2channel}
+                value={channelState.plus2channel}
+              />
+            }
+            label="+2"
+          />
+        </FormGroup>
           <TextField
             label="Launch Start"
             value={channelState.launchStart}

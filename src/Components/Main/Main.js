@@ -3,6 +3,7 @@ import Footer from "./footer/Footer";
 import Brand from "./header/Brand";
 import DataHub from "../Main/datahub/DataHub";
 import MyTabs from "../../Components/Main/nav/tabs/MyTabs";
+import './Main.css'
 
 class Main extends Component {
   render() {

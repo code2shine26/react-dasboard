@@ -14,11 +14,14 @@
 }
 
 .MainFooter {
-  margin: "auto";
   background: linear-gradient(45deg, #333333 30%, #333334 90%);
   border: 0;
   border-radius: 7;
   box-shadow: "0 3px 5px 2px #ccc";
   color: "white";
-  padding: "0 30px";
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 3.5rem;   
+  margin-top: 20px;
 }

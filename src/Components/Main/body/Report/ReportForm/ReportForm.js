@@ -5,19 +5,21 @@ import FormControl from "@material-ui/core/FormControl";
 import MenuItem from "@material-ui/core/MenuItem";
 import DateFnsUtils from "@date-io/date-fns";
 import InputLabel from "@material-ui/core/InputLabel";
-import MessageDialog from "../../util/Messages/MessageDialog";
 import {
   KeyboardDatePicker,
   MuiPickersUtilsProvider
 } from "@material-ui/pickers";
+import SnackbarContent from '@material-ui/core/SnackbarContent';
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import Radio from "@material-ui/core/Radio";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import RadioGroup from "@material-ui/core/RadioGroup";
+import MySnackbarContentWrapper from '../../util/MySnackBarContentWrapper'
 import Select from "@material-ui/core/Select";
 import TextField from "@material-ui/core/TextField";
 import axios from "axios";
+import Snackbar from '@material-ui/core/Snackbar';
 import "./ReportForm.css";
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -39,11 +41,22 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function ReportForm(props) {
+  const SUCCESS_MESSAGE ="Report generation initiated successfully";
+  const FAILURE_MESSAGE ="OOPS! There was a problem in saving changes.Try later";
   console.log("Report Form props::", props);
   const handleChange = name => event => {
     setValues({ ...values, [name]: event.target.value });
   };
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
 
+    setOpen(false);
+  };
+  const[message,setMessage]= React.useState(SUCCESS_MESSAGE);
+  const[variant,setVariant]= React.useState("success");
+  const [open, setOpen] = React.useState(false);
   const clearFields = () => {
     setValues({
       compliancePeriod: "",
@@ -60,6 +73,7 @@ export default function ReportForm(props) {
   };
   const onSubmitHandler = evt => {
     evt.preventDefault();
+    setOpen(true);
     clearFields();
   };
   const shoudEnable = () => {
@@ -119,7 +133,7 @@ export default function ReportForm(props) {
 
   return (
     <div className="ReportForm">
-      <AppBar position="static" style={{ background: "#484c7f" }}>
+      <AppBar position="static" style={{ background: "#5d5d5d" }}>
         <Typography variant="h7">Report Generation</Typography>
       </AppBar>
 
@@ -214,12 +228,13 @@ export default function ReportForm(props) {
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
               <KeyboardDatePicker
                 fullWidth
+                autoOk={true}
                 disableToolbar
                 variant="inline"
                 format="MM/dd/yyyy"
                 margin="normal"
                 id="date-picker-inline"
-                label="Date picker inline"
+                label="Effective Date"
                 value={values.effectiveDate}
                 onChange={handleDateChange}
                 KeyboardButtonProps={{
@@ -258,6 +273,25 @@ export default function ReportForm(props) {
         </Grid>
       </form>
       {/* <MessageDialog message="All good" outcome="success" /> */}
+      <Grid item xs={12}>
+      
+      <Snackbar
+      anchorOrigin={
+        { vertical: 'bottom', horizontal: 'left' }
+      }
+      open={open}
+      elementType="Grow"
+      autoHideDuration={6000}
+      onClose={handleClose}
+    >
+      <MySnackbarContentWrapper
+        onClose={handleClose}
+        variant="success"
+        message="Report generation initiated successfully and will be downloaded  "
+      />
+    </Snackbar>
+   
+      </Grid>
     </div>
   );
 }

@@ -2,6 +2,6 @@
   font: inherit;
   width: 100%;
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-direction: column;
+  flex-wrap: nowrap;
 }

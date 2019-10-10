@@ -5,9 +5,12 @@ import AppBar from "@material-ui/core/AppBar";
 import TextField from "@material-ui/core/TextField";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
+import SnackbarContent from '@material-ui/core/SnackbarContent';
 import Button from "@material-ui/core/Button";
 import InputLabel from "@material-ui/core/InputLabel";
+import Snackbar from '@material-ui/core/Snackbar';
 import "./acmaConfigForm.css";
+import MySnackbarContentWrapper from '../../util/MySnackBarContentWrapper'
 import axios from "axios";
 import FormControl from "@material-ui/core/FormControl";
 import { makeStyles } from "@material-ui/core/styles";
@@ -33,10 +36,43 @@ const useStyles = makeStyles(theme => ({
 }));
 export default function AcmaCaptionForm(props) {
   const endpoint = "http://localhost:3004/acmaCaption";
+  const SUCCESS_MESSAGE ="Changes are saved successfully";
+  const FAILURE_MESSAGE ="OOPS! There was a problem in saving changes.Try later";
   const classes = useStyles();
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
 
+    setOpen(false);
+  };
   const handleSubmit = evt => {
     evt.preventDefault();
+
+    // make the ajax reuqest to save the data
+     async function saveChanges() {
+      let splitCateory = values.acmaCategory.split(' ');
+      let acmaCatTransform = splitCateory ? splitCateory.join('_') : values.acmaCategory;
+      //console.log('Acma transofrm::',acmaCatTransform);
+      let id=`${values.compliancePeriod}_${acmaCatTransform}`
+      try{
+        let response = await axios.put(`${endpoint}/${id}`, {
+          caption: values.actualCaptionPercent,
+          id:id,
+          category: values.acmaCategory,
+          finYear: values.compliancePeriod
+         });
+         console.log('Reponse', response);
+         setOpen(true);
+      }catch(err){
+        console.error('Acma caption Form saving failed ',err);
+        setVariant("error");
+        setMessage(FAILURE_MESSAGE);
+        setOpen(true);
+      }
+    
+    }
+    saveChanges();
   };
 
   const isSaveAcmaConfigDisabled = () => {
@@ -74,6 +110,9 @@ export default function AcmaCaptionForm(props) {
   const handleChange = name => event => {
     setValues({ ...values, [name]: event.target.value });
   };
+  const[message,setMessage]= React.useState(SUCCESS_MESSAGE);
+  const[variant,setVariant]= React.useState("success");
+  const [open, setOpen] = React.useState(false);
   const [values, setValues] = useState({
     acmaCategory: "",
     actualCaptionPercent: 0,
@@ -99,31 +138,33 @@ export default function AcmaCaptionForm(props) {
   useEffect(() => {
     if (values.compliancePeriod !== "" && values.acmaCategory !== "") {
       async function getCaptionCompliance() {
-        let selectedYearResponse = await axios.get(
-          `${endpoint}?finYear=${values.compliancePeriod}&catgory=${values.acmaCategory}`
-        );
-        let respCurrent = selectedYearResponse.data[0];
-        let previousYearResponse = await axios.get(
-          `${endpoint}?finYear=${values.compliancePeriod - 1}&catgory=${
-            values.acmaCategory
-          }`
-        );
-        let respPrevious = previousYearResponse.data[0];
-        console.log("Anwitha:::", respCurrent, respPrevious);
-        if (respCurrent) {
-          setValues({
-            ...values,
-            prevYearCaptionPercent: respPrevious["caption"],
-            actualCaptionPercent: respCurrent["caption"]
-          });
+        try{
+          let selectedYearResponse = await axios.get(
+            `${endpoint}?finYear=${values.compliancePeriod}&category=${values.acmaCategory}`
+          );
+          let respCurrent = selectedYearResponse.data[0];
+          let previousYearResponse = await axios.get(
+            `${endpoint}?finYear=${values.compliancePeriod - 1}&category=${
+              values.acmaCategory
+            }`
+          );
+          let respPrevious = previousYearResponse.data[0];
+          console.log("Anwitha:::", respCurrent, respPrevious);
+          if (respCurrent && respPrevious) {
+            setValues({
+              ...values,
+              prevYearCaptionPercent: respPrevious["caption"],
+              actualCaptionPercent: respCurrent["caption"]
+            });
+          }
+        }catch(err){
+           console.error('Could not fetch the data ',err);
+           setVariant("error");
+           setMessage(FAILURE_MESSAGE);
+           setOpen(true)
         }
-        //   if (respPrevious) {
-        //     setValues({
-        //       ...values,
-        //       prevYearCaptionPercent: respPrevious["caption"]
-        //     });
-        //   }
-        // }
+        
+       
       }
       getCaptionCompliance();
     }
@@ -131,7 +172,7 @@ export default function AcmaCaptionForm(props) {
 
   return (
     <div className="AcmaCaptionForm">
-      <AppBar position="static" style={{ background: "#484c7f" }}>
+      <AppBar position="static" style={{ background: "#5d5d5d" }}>
         <Typography variant="h7">ACMA Configuration</Typography>
       </AppBar>
       <form className="Acma-form" onSubmit={handleSubmit}>
@@ -212,7 +253,26 @@ export default function AcmaCaptionForm(props) {
               </button>
             )}
           </Grid>
+          <Grid item xs={12}>
+      
+          <Snackbar
+          anchorOrigin={
+            { vertical: 'bottom', horizontal: 'left' }
+          }
+          open={open}
+          autoHideDuration={6000}
+          onClose={handleClose}
+        >
+          <MySnackbarContentWrapper
+            onClose={handleClose}
+            variant="success"
+            message="Changes have been saved successfuly"
+          />
+        </Snackbar>
+       
+          </Grid>
         </Grid>
+        
       </form>
     </div>
   );

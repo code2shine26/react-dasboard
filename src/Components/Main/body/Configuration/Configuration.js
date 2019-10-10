@@ -7,7 +7,6 @@ export default function Configuration(props) {
   return (
     <div className="Configuration">
       <AcmaCaptionForm {...props} />
-
       <ChannelContractualForm {...props} />
       <ChannelConfig {...props} />
     </div>
