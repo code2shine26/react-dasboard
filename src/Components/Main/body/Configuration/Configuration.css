@@ -1,7 +1,17 @@
 .Configuration {
   font: inherit;
-  width: 100%;
   display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
+  justify-content: space-evenly;
+  margin-bottom: 15px;
+ 
+}
+
+.chan-form {
+  width:40%;  
+  
+}
+
+.cap-form {
+  width:60%;
+
 }

@@ -29,10 +29,28 @@ export default function ChannelConfig(props) {
   const FAILURE_MESSAGE ="OOPS! There was a problem in saving changes.Try later";
   const [isFormValid,setIsFormValid]= useState(true);
   const [isNewRecord,setisNewRecord] = useState(false);
+  const isPastFiscalYear = (year) => {
+      let today = new Date();
+      let endDateStr = `30-06-${year+1}`;
+      let startDateStr = `01-07-${year}`;
+      //console.log('timessss:::',startDateStr,endDateStr);
+      let fyearEnd = new Date(endDateStr.replace( /(\d{2})-(\d{2})-(\d{4})/, "$2/$1/$3"))
+      let fyearStart= new Date(startDateStr.replace( /(\d{2})-(\d{2})-(\d{4})/, "$2/$1/$3"))
+      console.log('timessss:::',fyearStart,fyearEnd);
+      if((today.getTime() > fyearEnd.getTime()))
+      {
+        return false;
+      }
+      return true;
+    
+    
+  }
   const [values, setValues] = useState({
     finYear: 0,
     tier: 0,
+    isPastFiscalYear:true,
     acmaCategory: 0,
+    contractualCategory:0,
     channel: 0,
     channelGroup: 0,
     hdChannel: false,
@@ -58,9 +76,9 @@ export default function ChannelConfig(props) {
    // make the ajax reuqest to save the data
    async function saveChanges() {
     let splitCateory = values.acmaCategory.split(' ');
-    let acmaCatTransform = splitCateory ? splitCateory.join('_') : values.acmaCategory;
+    //let acmaCatTransform = splitCateory ? splitCateory.join('_') : values.acmaCategory;
     //console.log('Acma transofrm::',acmaCatTransform);
-    let id=`${values.finYear}_${values.channel}_${acmaCatTransform}`
+    let id=`${values.finYear}_${values.channel}`
     try{
       let response ;
       if(isNewRecord) {
@@ -97,26 +115,30 @@ export default function ChannelConfig(props) {
           if (channelData && channelData.length > 0) {
             let payLoad = channelData[0];
             if(payLoad) {
+             
               setValues({
                 ...values,
                 acmaCategory:payLoad['acmaCategory'],
+                contractualCategory:payLoad['contractualCategory'],
                 tier: payLoad['tier'],
                 channelGroup: payLoad['channelGroup'],
                 hdChannel: payLoad['hdChannel'],
                 sdChannel: payLoad['sdChannel'],
                 fourkChannel: payLoad['fourkChannel'],
                 plus2channel: payLoad['plus2channel'],
-                launchStartDate:payLoad['launchStartDate'],
-                launchEndDate:payLoad['launchEndDate']
+                launchStartDate:payLoad['launchStartDate'] ? new Date(payLoad['launchStartDate']) : null,
+                launchEndDate:payLoad['launchEndDate'] ? new Date(payLoad['launchEndDate']) : null,
+                launchStartTime:payLoad['launchStartTime'] ? new Date(payLoad['launchStartTime']): null,
+                launchEndTime: payLoad['launchEndTime'] ?  new Date(payLoad['launchEndTime']) : null
                 
               });
             }
             
           }else{
             let splitCateory = values.acmaCategory.split(' ');
-            let acmaCatTransform = splitCateory ? splitCateory.join('_') : values.acmaCategory;
+            //let acmaCatTransform = splitCateory ? splitCateory.join('_') : values.acmaCategory;
             //console.log('Acma transofrm::',acmaCatTransform);
-            let id=`${values.finYear}_${values.channel}_${acmaCatTransform}`
+            let id=`${values.finYear}_${values.channel}`
             setValues({
               ...values,
               id:id,
@@ -157,9 +179,19 @@ return false;
   const handleChangeCheckbox = name => event => {
     setValues({ ...values, [name]: event.target.checked });
   };
+
+  const handleFiscalYear = (evt) => {
+    console.log('fffyear::',evt.target.value)
+      let isFiscalYear = isPastFiscalYear(evt.target.value);
+      console.log('isFiscalYear::',isFiscalYear);
+      setValues({...values,
+        isPastFiscalYear:isFiscalYear,
+        finYear:evt.target.value})
+  }
   const handleChange = name => event => {
     console.log("name::", name);
     console.log("event::", event);
+    
     setValues({ ...values, [name]: event.target.value });
   };
   const[message,setMessage]= React.useState(SUCCESS_MESSAGE);
@@ -167,7 +199,7 @@ return false;
   const [open, setOpen] = React.useState(false);
   
   const isChannelSaveButtonDisabled = () => {
-     if(values.finYear === 0 || values.acmaCategory === 0 || values.channel === 0 || validateDates()){
+     if(values.finYear === 0 || values.acmaCategory === 0 || values.channel === 0 || validateDates() ){
        return true;
      }
      return false;
@@ -200,7 +232,9 @@ return false;
     console.log('time::',time);
     console.log('Hours::',time.getHours());
     console.log('Minutes::',time.getMinutes());
-    setValues({...values,"launchStartTime": time});
+    let launchTime = new Date(values.launchStartDate.setTime(time.getTime()));
+    console.log('Launch Time::',launchTime);
+    setValues({...values,"launchStartTime":launchTime });
   };
   const handleLaunchEndTime = time => {
     setValues({...values,"launchEndTime": time});
@@ -210,8 +244,8 @@ return false;
   };
   return (
     <div className="ChannelConfig">
-      <AppBar position="static" style={{ background: "#5d5d5d" }}>
-        <Typography variant="h7">Channel Configuration</Typography>
+      <AppBar position="static" style={{ background: "#5c5757" }}>
+        <Typography variant="h7"><strong>Channel Configuration</strong></Typography>
       </AppBar>
       <div>
         <form onSubmit={handleSubmit} className="ChannelConfig-form">
@@ -223,7 +257,7 @@ return false;
                 </InputLabel>
                 <Select
                   value={values.finYear}
-                  onChange={handleChange("finYear")}
+                  onChange={handleFiscalYear}
                 >
                   <MenuItem value={0}>Select Compliance Period</MenuItem>
 
@@ -252,10 +286,12 @@ return false;
                 </Select>
               </FormControl>
             </Grid>
+            
             <Grid item xs={12}>
-              <FormControl required fullWidth variant="standard">
+              <FormControl  required fullWidth variant="standard">
                 <InputLabel htmlFor="acma-category">ACMA Category</InputLabel>
                 <Select
+                disabled={!values.isPastFiscalYear}
                   value={values.acmaCategory}
                   onChange={handleChange("acmaCategory")}
                 >
@@ -268,9 +304,26 @@ return false;
               </FormControl>
             </Grid>
             <Grid item xs={12}>
+              <FormControl required fullWidth variant="standard">
+                <InputLabel htmlFor="contractual-category">Channel Contractual Category</InputLabel>
+                <Select
+                  disabled={!values.isPastFiscalYear}
+                  value={values.contractualCategory}
+                  onChange={handleChange("contractualCategory")}
+                >
+                  <MenuItem value={0}>Select Contractual Category</MenuItem>
+                  {props.acmaCategories &&
+                    props.acmaCategories.map(category => {
+                      return <MenuItem value={category}>{category}</MenuItem>;
+                    })}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
               <FormControl fullWidth variant="standard">
                 <InputLabel htmlFor="acma-category">Channel Group</InputLabel>
                 <Select
+                disabled={!values.isPastFiscalYear}
                   value={values.channelGroup}
                   onChange={handleChange("channelGroup")}
                 >
@@ -286,7 +339,7 @@ return false;
             <Grid item xs={12}>
               <FormControl fullWidth variant="standard">
                 <InputLabel htmlFor="acma-category">Teir</InputLabel>
-                <Select value={values.tier} onChange={handleChange("tier")}>
+                <Select value={values.tier} onChange={handleChange("tier")} disabled={!values.isPastFiscalYear}>
                   <MenuItem value={0}>Select Teir</MenuItem>
                   {props.tier &&
                     props.tier.map(tier => {
@@ -303,6 +356,7 @@ return false;
                     onChange={handleChangeCheckbox("sdChannel")}
                     control={
                       <Checkbox
+                      disabled={!values.isPastFiscalYear}
                         checked={values.sdChannel}
                         value={values.sdChannel}
                       />
@@ -313,6 +367,7 @@ return false;
                     onChange={handleChangeCheckbox("hdChannel")}
                     control={
                       <Checkbox
+                      disabled={!values.isPastFiscalYear}
                         checked={values.hdChannel}
                         value={values.hdChannel}
                       />
@@ -323,6 +378,7 @@ return false;
                     onChange={handleChangeCheckbox("fourkChannel")}
                     control={
                       <Checkbox
+                      disabled={!values.isPastFiscalYear}
                         checked={values.fourkChannel}
                         value={values.fourkChannel}
                       />
@@ -333,6 +389,7 @@ return false;
                     onChange={handleChangeCheckbox("plus2channel")}
                     control={
                       <Checkbox
+                      disabled={!values.isPastFiscalYear}
                         checked={values.plus2channel}
                         value={values.plus2channel}
                       />
@@ -351,7 +408,7 @@ return false;
               autoOk={true}
               disableToolbar
               variant="inline"
-              
+              disabled={!values.isPastFiscalYear}
               format="dd/MM/yyyy"
               margin="normal"
               id="date-picker-inline"
@@ -366,7 +423,7 @@ return false;
             <Grid item xs={6}>
               <KeyboardTimePicker
               fullWidth
-                disabled={isEnableLuanchtDate('launchStartDate')}
+                disabled={isEnableLuanchtDate('launchStartDate') ||  !values.isPastFiscalYear}
                   margin="normal"
                   id="time-picker"
                   label="Launch Start Time"
@@ -379,6 +436,7 @@ return false;
         </Grid>
         <Grid item xs={6}>
               <KeyboardDatePicker
+              disabled={!values.isPastFiscalYear}
               fullWidth
               autoOk={true}
               disableToolbar
@@ -399,7 +457,7 @@ return false;
               <KeyboardTimePicker
               fullWidth
                   margin="normal"
-                  disabled={isEnableLuanchtDate('launchEndDate')}
+                  disabled={isEnableLuanchtDate('launchEndDate') ||  !values.isPastFiscalYear}
                   id="time-picker"
                   label="Launch End Time"
                   value={values.launchEndTime}
@@ -413,7 +471,8 @@ return false;
             
             
             <Grid ullWidth xs={12}>
-              <button disabled={isChannelSaveButtonDisabled()} className="GenerateReport">Save</button>
+            { values.isPastFiscalYear && 
+              <button disabled={isChannelSaveButtonDisabled()} className="GenerateReport">Save</button>}
             </Grid>
             <Grid item xs={12}>
           <Snackbar

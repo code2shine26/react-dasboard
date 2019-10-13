@@ -9,6 +9,12 @@ import AppBar from "@material-ui/core/AppBar";
 import FormGroup from "@material-ui/core/FormGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
+import DateFnsUtils from '@date-io/date-fns';
+import {
+  KeyboardDatePicker,
+  MuiPickersUtilsProvider,
+  KeyboardTimePicker,
+} from '@material-ui/pickers';
 import "./Report.css";
 const useStyles = makeStyles(theme => ({
   container: {
@@ -34,12 +40,13 @@ export default function Report(props) {
     console.log("Clear fields called");
     setChannelState({
       acmaCategory: "",
+      contractualCategory:"",
       hdChannel:false,
       sdChannel:false,
       fourkChannel:false,
       channelGroup: "",
-      launchEnd: "",
-      launchStart: "",
+      launchStartDate: null,
+      launchEndDate: null,
       tier: ""
     });
     setAcmaCaption(0);
@@ -55,8 +62,8 @@ export default function Report(props) {
     fourkChannel:false,
     plus2channel: false,
     channelGroup: "",
-    launchEnd: "",
-    launchStart: "",
+    launchEndDate: null,
+    launchStartDate: null,
     tier: ""
   });
 
@@ -131,6 +138,13 @@ export default function Report(props) {
             variant="standard"
           />
           <TextField
+          disabled
+          label="Channel Contractual Category"
+          value={channelState.contractualCategory}
+          margin="normal"
+          variant="standard"
+        />
+          <TextField
             disabled
             label="Channel Group"
             value={channelState.channelGroup}
@@ -186,20 +200,39 @@ export default function Report(props) {
             label="+2"
           />
         </FormGroup>
-          <TextField
-            label="Launch Start"
-            value={channelState.launchStart}
-            margin="normal"
-            disabled
-            variant="standard"
-          />
-          <TextField
-            label="Launch End"
-            value={channelState.launchEnd}
-            margin="normal"
-            disabled
-            variant="standard"
-          />
+        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+        <KeyboardDatePicker
+          fullWidth
+          disabled
+          autoOk={true}
+          disableToolbar
+          variant="inline"
+          format="dd/MM/yyyy"
+          margin="normal"
+          id="date-picker-inline"
+          label="Launch Start Date"
+          value={channelState.launchStartDate}
+          KeyboardButtonProps={{
+            "aria-label": "change date"
+          }}
+        />
+        <KeyboardDatePicker
+          fullWidth
+          disabled
+          autoOk={true}
+          disableToolbar
+          variant="inline"
+          format="dd/MM/yyyy"
+          margin="normal"
+          id="date-picker-inline"
+          label="Launch End Date"
+          value={channelState.launchEndDate}
+          KeyboardButtonProps={{
+            "aria-label": "change date"
+          }}
+        />
+      </MuiPickersUtilsProvider>
+         
         </div>
       )}
     </div>

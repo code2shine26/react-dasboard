@@ -10,6 +10,7 @@ import Button from "@material-ui/core/Button";
 import MySnackbarContentWrapper from '../../util/MySnackBarContentWrapper'
 import SnackbarContent from '@material-ui/core/SnackbarContent';
 import axios from "axios";
+import {isValidPecent} from '../../util/Validation/Validate';
 import "./ChannelContractualForm.css";
 import Snackbar from '@material-ui/core/Snackbar';
 import FormControl from "@material-ui/core/FormControl";
@@ -64,15 +65,15 @@ export default function ChannelContractualCaptionForm(props) {
 
   const isHideSaveAcmaConfig = () => {
     if (
-      isCaptionDisbaled(values.actualCaptionPercent, values.compliancePeriod)
+      isCaptionDisbaled(values.acmaCategory, values.compliancePeriod)
     ) {
       return true;
     }
     return false;
   };
-  const isCaptionDisbaled = (captionPercent, finYear) => {
+  const isCaptionDisbaled = (category, captionPercent, finYear) => {
     //exempt categoey
-    return isCaptionExempt(captionPercent) || isMaxCaptions(captionPercent);
+    return isCaptionExempt(category) || isMaxCaptions(captionPercent);
   };
 
   const isMaxCaptions = percent => {
@@ -82,9 +83,6 @@ export default function ChannelContractualCaptionForm(props) {
     return false;
   };
   const getCaptionValue = captionVal => {
-    if (isCaptionExempt(captionVal)) {
-      return "N/A";
-    }
     return captionVal;
   };
   const handleChange = name => event => {
@@ -93,12 +91,36 @@ export default function ChannelContractualCaptionForm(props) {
   const[message,setMessage]= React.useState(SUCCESS_MESSAGE);
   const[variant,setVariant]= React.useState("success");
   const [open, setOpen] = React.useState(false);
+  const handleFinYear = (evt) => {
+    let isFiscalYear = isPastFiscalYear(evt.target.value);
+    console.log('isFiscalYear::',isFiscalYear);
+    setValues({...values,
+      isPastFiscalYear:isFiscalYear,
+      compliancePeriod:evt.target.value})
+  }
+  const isPastFiscalYear = (year) => {
+    let today = new Date();
+    let endDateStr = `30-06-${year+1}`;
+    let startDateStr = `01-07-${year}`;
+    //console.log('timessss:::',startDateStr,endDateStr);
+    let fyearEnd = new Date(endDateStr.replace( /(\d{2})-(\d{2})-(\d{4})/, "$2/$1/$3"))
+    let fyearStart= new Date(startDateStr.replace( /(\d{2})-(\d{2})-(\d{4})/, "$2/$1/$3"))
+    console.log('timessss:::',fyearStart,fyearEnd);
+    if((today.getTime() > fyearEnd.getTime()))
+    {
+      return false;
+    }
+    return true;
+  
+  
+}
   const [values, setValues] = useState({
     acmaCategory: "",
     actualCaptionPercent: 0,
     compliancePeriod: "",
     prevYearCaptionPercent: 0,
-    dataNotFound: false
+    dataNotFound: false,
+    isPastFiscalYear:true,
   });
   const isCurrentFinYear = () => {
     let currYear = new Date().getFullYear();
@@ -109,8 +131,9 @@ export default function ChannelContractualCaptionForm(props) {
     }
   };
 
-  const isCaptionExempt = percent => {
-    if (percent && percent === -1) {
+  const isCaptionExempt = category => {
+    if (category && category.toString().includes("Exempt")) {
+      console.log('caption exempty');
       return true;
     }
     return false;
@@ -129,11 +152,20 @@ export default function ChannelContractualCaptionForm(props) {
         );
         let respPrevious = previousYearResponse.data[0];
         console.log("Anwitha:::", respCurrent, respPrevious);
-        if (respCurrent) {
+        if (respCurrent && respPrevious) {
           setValues({
             ...values,
             prevYearCaptionPercent: respPrevious["caption"],
             actualCaptionPercent: respCurrent["caption"]
+          });
+        } else{
+          
+          setValues({
+            ...values,
+            actualCaptionPercent: 0,
+           
+            prevYearCaptionPercent: 0,
+            dataNotFound: false
           });
         }
         //   if (respPrevious) {
@@ -150,8 +182,8 @@ export default function ChannelContractualCaptionForm(props) {
 
   return (
     <div className="ContractualCaptionForm">
-      <AppBar position="static" style={{ background: "#5d5d5d" }}>
-        <Typography variant="h7">Channel Contractual Configuration</Typography>
+      <AppBar position="static" style={{ background: "#5c5757" }}>
+        <Typography variant="h7"><strong>Channel Contractual Configuration</strong></Typography>
       </AppBar>
       <form className="Acma-form" onSubmit={handleSubmit}>
         <Grid container spacing={3}>
@@ -171,7 +203,7 @@ export default function ChannelContractualCaptionForm(props) {
               <InputLabel htmlFor="acma-category">Compliance Period</InputLabel>
               <Select
                 value={values.compliancePeriod}
-                onChange={handleChange("compliancePeriod")}
+                onChange={handleFinYear}
               >
                 <MenuItem value={0}>Select Compliance Period</MenuItem>
                 {props.fyYears &&
@@ -183,7 +215,7 @@ export default function ChannelContractualCaptionForm(props) {
           </Grid>
           <Grid item xs={12}>
             <FormControl required fullWidth variant="standard">
-              <InputLabel htmlFor="acma-category">ACMA Category</InputLabel>
+              <InputLabel htmlFor="acma-category">Channel Contractual Category</InputLabel>
               <Select
                 value={values.acmaCategory}
                 onChange={handleChange("acmaCategory")}
@@ -200,10 +232,13 @@ export default function ChannelContractualCaptionForm(props) {
             <TextField
               required
               fullWidth
+              helperText="Enter valid % between 0 - 100"
+              error={!isValidPecent(values.actualCaptionPercent)}
               disabled={isCaptionDisbaled(
+                values.acmaCategory,
                 values.actualCaptionPercent,
                 values.compliancePeriod
-              )}
+              ) || !values.isPastFiscalYear}
               variant="standard"
               id="standard-required"
               label="Caption % "
@@ -217,14 +252,14 @@ export default function ChannelContractualCaptionForm(props) {
               fullWidth
               variant="filled"
               id="standard-required"
-              label="Contactual Caption %(Prev year) "
+              label="Caption %(Prev year) "
               value={getCaptionValue(values.prevYearCaptionPercent)}
             />
           </Grid>
           <Grid item xs={12}>
-            {!isHideSaveAcmaConfig() && (
+            {(!isHideSaveAcmaConfig() && values.isPastFiscalYear) && (
               <button
-                disabled={isSaveAcmaConfigDisabled()}
+                disabled={isSaveAcmaConfigDisabled() || !isValidPecent(values.actualCaptionPercent,values.acmaCategory)}
                 className="GenerateReport"
               >
                 Save

@@ -6,9 +6,15 @@ import "./Configuration.css";
 export default function Configuration(props) {
   return (
     <div className="Configuration">
-      <AcmaCaptionForm {...props} />
-      <ChannelContractualForm {...props} />
-      <ChannelConfig {...props} />
+     
+       <div className="cap-form">
+          <AcmaCaptionForm {...props} />
+          <ChannelContractualForm {...props} />
+       </div>
+       <div className="chan-form">
+       <ChannelConfig {...props} />
+       </div>
+      
     </div>
   );
 }

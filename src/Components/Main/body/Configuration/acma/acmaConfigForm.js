@@ -5,6 +5,7 @@ import AppBar from "@material-ui/core/AppBar";
 import TextField from "@material-ui/core/TextField";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
+import {isValidPecent} from '../../util/Validation/Validate';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
 import Button from "@material-ui/core/Button";
 import InputLabel from "@material-ui/core/InputLabel";
@@ -46,6 +47,25 @@ export default function AcmaCaptionForm(props) {
 
     setOpen(false);
   };
+
+ 
+  
+  const isPastFiscalYear = (year) => {
+    let today = new Date();
+    let endDateStr = `30-06-${year+1}`;
+    let startDateStr = `01-07-${year}`;
+    //console.log('timessss:::',startDateStr,endDateStr);
+    let fyearEnd = new Date(endDateStr.replace( /(\d{2})-(\d{2})-(\d{4})/, "$2/$1/$3"))
+    let fyearStart= new Date(startDateStr.replace( /(\d{2})-(\d{2})-(\d{4})/, "$2/$1/$3"))
+    console.log('timessss:::',fyearStart,fyearEnd);
+    if((today.getTime() > fyearEnd.getTime()))
+    {
+      return false;
+    }
+    return true;
+  
+  
+}
   const handleSubmit = evt => {
     evt.preventDefault();
 
@@ -75,6 +95,9 @@ export default function AcmaCaptionForm(props) {
     saveChanges();
   };
 
+
+
+  
   const isSaveAcmaConfigDisabled = () => {
     if (values.acmaCategory === "" || values.compliancePeriod === "") {
       return true;
@@ -92,7 +115,7 @@ export default function AcmaCaptionForm(props) {
   };
   const isCaptionDisbaled = (captionPercent, finYear) => {
     //exempt categoey
-    return isCaptionExempt(captionPercent) || isMaxCaptions(captionPercent);
+    return (isCaptionExempt(values.acmaCategory) || isMaxCaptions(captionPercent));
   };
 
   const isMaxCaptions = percent => {
@@ -103,10 +126,17 @@ export default function AcmaCaptionForm(props) {
   };
   const getCaptionValue = captionVal => {
     if (isCaptionExempt(captionVal)) {
-      return "N/A";
+      return 0;
     }
     return captionVal;
   };
+  const handleFinYear = (evt) => {
+    let isFiscalYear = isPastFiscalYear(evt.target.value);
+    console.log('isFiscalYear::',isFiscalYear);
+    setValues({...values,
+      isPastFiscalYear:isFiscalYear,
+      compliancePeriod:evt.target.value})
+  }
   const handleChange = name => event => {
     setValues({ ...values, [name]: event.target.value });
   };
@@ -115,6 +145,7 @@ export default function AcmaCaptionForm(props) {
   const [open, setOpen] = React.useState(false);
   const [values, setValues] = useState({
     acmaCategory: "",
+    isPastFiscalYear:true,
     actualCaptionPercent: 0,
     compliancePeriod: "",
     prevYearCaptionPercent: 0,
@@ -129,8 +160,10 @@ export default function AcmaCaptionForm(props) {
     }
   };
 
-  const isCaptionExempt = percent => {
-    if (percent && percent === -1) {
+  const isCaptionExempt = category => {
+    
+    if (category && category.toString().includes("Exempt")) {
+      console.log('caption exempty');
       return true;
     }
     return false;
@@ -156,6 +189,14 @@ export default function AcmaCaptionForm(props) {
               prevYearCaptionPercent: respPrevious["caption"],
               actualCaptionPercent: respCurrent["caption"]
             });
+          }else{
+            setValues({
+              ...values,
+              actualCaptionPercent: 0,
+             
+              prevYearCaptionPercent: 0,
+              dataNotFound: false
+            });
           }
         }catch(err){
            console.error('Could not fetch the data ',err);
@@ -172,8 +213,8 @@ export default function AcmaCaptionForm(props) {
 
   return (
     <div className="AcmaCaptionForm">
-      <AppBar position="static" style={{ background: "#5d5d5d" }}>
-        <Typography variant="h7">ACMA Configuration</Typography>
+      <AppBar position="static" style={{ background: "#5c5757" }}>
+        <Typography variant="h7"><strong>ACMA Configuration</strong></Typography>
       </AppBar>
       <form className="Acma-form" onSubmit={handleSubmit}>
         <Grid container spacing={3}>
@@ -193,7 +234,7 @@ export default function AcmaCaptionForm(props) {
               <InputLabel htmlFor="acma-category">Compliance Period</InputLabel>
               <Select
                 value={values.compliancePeriod}
-                onChange={handleChange("compliancePeriod")}
+                onChange={handleFinYear}
               >
                 <MenuItem value={0}>Select Compliance Period</MenuItem>
                 {props.fyYears &&
@@ -207,6 +248,7 @@ export default function AcmaCaptionForm(props) {
             <FormControl required fullWidth variant="standard">
               <InputLabel htmlFor="acma-category">ACMA Category</InputLabel>
               <Select
+           
                 value={values.acmaCategory}
                 onChange={handleChange("acmaCategory")}
               >
@@ -220,12 +262,15 @@ export default function AcmaCaptionForm(props) {
           </Grid>
           <Grid item xs={6}>
             <TextField
+            type="number"
+            error={!isValidPecent(values.actualCaptionPercent)}
+            helperText="Enter valid % between 0 - 100"
               required
               fullWidth
               disabled={isCaptionDisbaled(
                 values.actualCaptionPercent,
                 values.compliancePeriod
-              )}
+              ) || !values.isPastFiscalYear}
               variant="standard"
               id="standard-required"
               label="Caption % "
@@ -236,6 +281,7 @@ export default function AcmaCaptionForm(props) {
           <Grid item xs={6}>
             <TextField
               disabled
+              type="number"
               fullWidth
               variant="filled"
               id="standard-required"
@@ -244,9 +290,9 @@ export default function AcmaCaptionForm(props) {
             />
           </Grid>
           <Grid item xs={12}>
-            {!isHideSaveAcmaConfig() && (
+            {(!isHideSaveAcmaConfig() && values.isPastFiscalYear ) && (
               <button
-                disabled={isSaveAcmaConfigDisabled()}
+                disabled={isSaveAcmaConfigDisabled() || !isValidPecent(values.actualCaptionPercent)}
                 className="GenerateReport"
               >
                 Save

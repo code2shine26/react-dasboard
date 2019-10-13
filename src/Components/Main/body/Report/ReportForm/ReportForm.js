@@ -133,8 +133,8 @@ export default function ReportForm(props) {
 
   return (
     <div className="ReportForm">
-      <AppBar position="static" style={{ background: "#5d5d5d" }}>
-        <Typography variant="h7">Report Generation</Typography>
+      <AppBar position="static" style={{ background: "#5c5757" }}>
+        <Typography variant="h7"><strong>Report Generation</strong></Typography>
       </AppBar>
 
       <form className="Rep-form" onSubmit={onSubmitHandler}>

@@ -8,6 +8,7 @@
   width: 35%;
   border: solid 1px black;
   padding: 5px;
+  box-shadow: 3px 3px 5px 6px #666;
   background: rgb(248, 246, 246);
   flex-direction: column;
 }
