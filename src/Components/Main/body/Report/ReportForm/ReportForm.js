@@ -133,7 +133,7 @@ export default function ReportForm(props) {
 
   return (
     <div className="ReportForm">
-      <AppBar position="static" style={{ background: "#5c5757" }}>
+      <AppBar position="static" style={{ background: "#3161a3" }}>
         <Typography variant="h7"><strong>Report Generation</strong></Typography>
       </AppBar>
 

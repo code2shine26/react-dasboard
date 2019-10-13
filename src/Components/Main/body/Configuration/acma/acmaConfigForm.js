@@ -213,7 +213,7 @@ export default function AcmaCaptionForm(props) {
 
   return (
     <div className="AcmaCaptionForm">
-      <AppBar position="static" style={{ background: "#5c5757" }}>
+      <AppBar position="static" style={{ background: "#3161a3" }}>
         <Typography variant="h7"><strong>ACMA Configuration</strong></Typography>
       </AppBar>
       <form className="Acma-form" onSubmit={handleSubmit}>

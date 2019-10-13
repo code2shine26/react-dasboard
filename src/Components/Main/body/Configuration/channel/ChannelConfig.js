@@ -244,7 +244,7 @@ return false;
   };
   return (
     <div className="ChannelConfig">
-      <AppBar position="static" style={{ background: "#5c5757" }}>
+      <AppBar position="static" style={{ background: "#3161a3" }}>
         <Typography variant="h7"><strong>Channel Configuration</strong></Typography>
       </AppBar>
       <div>

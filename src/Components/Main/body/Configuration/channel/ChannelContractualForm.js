@@ -182,7 +182,7 @@ export default function ChannelContractualCaptionForm(props) {
 
   return (
     <div className="ContractualCaptionForm">
-      <AppBar position="static" style={{ background: "#5c5757" }}>
+      <AppBar position="static" style={{ background: "#3161a3" }}>
         <Typography variant="h7"><strong>Channel Contractual Configuration</strong></Typography>
       </AppBar>
       <form className="Acma-form" onSubmit={handleSubmit}>
